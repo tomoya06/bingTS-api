@@ -12,16 +12,19 @@ module.exports = (req, res, next) => {
         return next() 
     }
 
+    const checkQuery = (method, req, targetQueries) => {
+        const queries = method==='GET'? req.query: req.body
+        for (let i=0; i<targetQueries.length; i++) { if (!queries[targetQueries[i]]) { return false } }
+        return true
+    }
+
     const { queries = [], method = 'GET' } = require(filepath)
     if (req.method !== method) {
         req.code = 405
         req.error = 'Invalid Request Method'
         req.skip = true
         return next()
-    } else if (!(function() {
-        for (let i=0; i<queries.length; i++) { if (!req.query[queries[i]]) { return false } }
-        return true
-    })()) {
+    } else if (!checkQuery(method, req, queries)) {
         req.code = 400
         req.error = 'Miss some queries'
         req.skip = true

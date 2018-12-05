@@ -15,10 +15,22 @@ function login(db, username, password) {
     })
 }
 
-module.exports = (req, res, next) => {
-    if (req.method !== 'POST') {
-        
+module.exports = {
+    method: 'POST',
+    queries: ['username', 'password'],
+    handler: (req, res, next, db) => {
+        const { username, password } = req.body
+        db.collection('user').findOne({ username, password })
+            .then(results => {
+                assert.notStrictEqual(results, null)
+                req.code = 200
+                req.results = results
+                return next()
+            })
+            .catch(err => {
+                req.code = 403
+                req.error = err
+                return next()
+            })
     }
-
-    next()
 }
