@@ -1,28 +1,56 @@
-const app = require("express")()
-const path = require("path")
-const fs = require("fs")
+const path = require('path')
+const fs = require('fs')
 
-const bodyParser = require("body-parser")
+const express = require('express')
+const app = express()
+const bodyParser = require('body-parser')
+const mongodb = require('mongodb')
 
-const responseRouter = require("./pre_routers/response")
-const loggerRouter = require("./pre_routers/logger")
+const responseRouter = require('./middlewares/response')
+const loggerRouter = require('./middlewares/logger')
+const validRouter = require('./middlewares/valid')
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+const config = require('./config')
 
-app.use(loggerRouter)
+const MongoClient = mongodb.MongoClient
 
-const files = fs.readdirSync(path.resolve(__dirname, 'routers'))
+const options = {
+    useNewUrlParser: true
+}
 
-files.forEach(file => {
-  let route = file.replace(/\.js$/i, '').replace(/^(\w*)$/i, '/$1')
-  let handler = require(`./routers/${file}`)
+const dbcntLogger = setInterval(() => {
+    console.count('Connecting to remote DB')
+}, 1000)
 
-  app.use(route, handler)
-})
+MongoClient.connect(config.dburl, options, function(error, database) {
+    clearInterval(dbcntLogger)
 
-app.use(responseRouter)
+    if (error) {
+        console.error(error)
+        return 
+    }
 
-app.listen(3000, function() {
-  console.log("Listening on port 3000")
+    const db = database.db()
+
+    app.use(bodyParser.json())
+    app.use(bodyParser.urlencoded({ extended: true }))
+    
+    app.use(loggerRouter)
+    app.use(validRouter)
+    
+    const files = fs.readdirSync(path.resolve(__dirname, 'routers'))
+    const handlerWrapper = handler => (req, res, next) => req.skip? next(): handler(req, res, next, db)
+    files.forEach(file => {
+        let route = file.replace(/\.js$/i, '').replace(/_/g, '/').replace(/^(\w*)$/i, '/$1')
+        let handler = handlerWrapper(require(`./routers/${file}`).handler)
+        app.use(route, handler)
+    })
+    
+    app.use(responseRouter)
+    
+    app.listen(3000, function() {
+        console.clear()
+        console.log('Connected to remote DB')
+        console.log('Listening on port 3000')
+    })
 })
