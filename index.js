@@ -18,7 +18,13 @@ const options = {
     useNewUrlParser: true
 }
 
+const dbcntLogger = setInterval(() => {
+    console.count('Connecting to remote DB')
+}, 1000)
+
 MongoClient.connect(config.dburl, options, function(error, database) {
+    clearInterval(dbcntLogger)
+
     if (error) {
         console.error(error)
         return 
@@ -43,6 +49,8 @@ MongoClient.connect(config.dburl, options, function(error, database) {
     app.use(responseRouter)
     
     app.listen(3000, function() {
+        console.clear()
+        console.log('Connected to remote DB')
         console.log('Listening on port 3000')
     })
 })
