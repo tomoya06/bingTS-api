@@ -1,4 +1,6 @@
-const Crawler = require('crawler')
+// const Crawler = require('crawler')
+const superagent = require('superagent')
+const saCheerio = require('superagent-cheerio')
 
 /**
  * ts api
@@ -11,29 +13,47 @@ module.exports = {
         const { keyword = '' } = req.query
         const url = `https://www.bing.com/dict/search?q=${keyword}`
 
-        const crawler = new Crawler()
-        crawler.direct({
-            uri: url,
-            skipEventRequest: false,
-            callback: function (error, response, done) {
-                if (error) {
-                    req.code = 500
-                    req.error = error
-                    next()
-                } else {
-                    var $ = response.$
-                    if ($('.content').find('.no_results').length > 0) {
-                        req.code = 404
-                        req.error = 'No results'
-                        next()
-                    } else {
-                        req.code = 200
-                        req.results = extractJson($)
-                        next()
-                    }
-                }
+        superagent.get(url).use(saCheerio).then(response => {
+            const $ = response.$
+            if ($('.content').find('.no_results').length > 0) {
+                req.code = 404
+                req.error = 'No results'
+                next()
+            } else {
+                req.code = 200
+                req.results = extractJson($)
+                next()
             }
+        }).catch(error => {
+            req.code = 500
+            req.error = error
+            next()
         })
+
+
+        // const crawler = new Crawler()
+        // crawler.direct({
+        //     uri: url,
+        //     skipEventRequest: false,
+        //     callback: function (error, response, done) {
+        //         if (error) {
+        //             req.code = 500
+        //             req.error = error
+        //             next()
+        //         } else {
+        //             var $ = response.$
+        //             if ($('.content').find('.no_results').length > 0) {
+        //                 req.code = 404
+        //                 req.error = 'No results'
+        //                 next()
+        //             } else {
+        //                 req.code = 200
+        //                 req.results = extractJson($)
+        //                 next()
+        //             }
+        //         }
+        //     }
+        // })
 
     }
 }
