@@ -10,6 +10,10 @@ const responseRouter = require('./middlewares/response')
 const loggerRouter = require('./middlewares/logger')
 const validRouter = require('./middlewares/valid')
 
+/*
+    config file should have:
+    dburl: string, target mongodb url
+*/
 const config = require('./config')
 
 const MongoClient = mongodb.MongoClient

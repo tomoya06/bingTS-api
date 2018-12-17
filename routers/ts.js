@@ -9,10 +9,12 @@ module.exports = {
     queries: ['keyword'],
     handler: (req, res, next) => {
         const { keyword = '' } = req.query
-        const url = `https://cn.bing.com/dict/search?q=${keyword}`
+        const url = `https://www.bing.com/dict/search?q=${keyword}`
 
-        const c = new Crawler({
-            maxConnections: 10,
+        const crawler = new Crawler()
+        crawler.direct({
+            uri: url,
+            skipEventRequest: false,
             callback: function (error, response, done) {
                 if (error) {
                     req.code = 500
@@ -33,7 +35,6 @@ module.exports = {
             }
         })
 
-        c.queue(url)
     }
 }
 
