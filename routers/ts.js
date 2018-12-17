@@ -9,6 +9,7 @@ const saCheerio = require('superagent-cheerio')
 module.exports = {
     method: 'GET',
     queries: ['keyword'],
+    scope: 'bingTS',
     handler: (req, res, next) => {
         const { keyword = '' } = req.query
         const url = `https://www.bing.com/dict/search?q=${keyword}`

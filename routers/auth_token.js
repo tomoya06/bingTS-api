@@ -23,10 +23,11 @@ function generateToken(client_id, username) {
     return {
         client_id,
         username,
-        access_token: crypto.createHash('sha256').update(client_id).update(username).update(moment().add(1, 'week').format('X')).digest('hex'),
-        expires_in: moment().add(1, 'week').format('X'),
-        refresh_token: crypto.createHash('sha256').update(client_id).update(username).update(moment().add(2, 'weeks').format('X')).digest('hex'),
-        refresh_token_expires_in: moment().add(2, 'weeks').format('X')
+        access_token: crypto.createHash('sha256').update(client_id).update(username).update(moment().add(1, 'week').format('x')).digest('hex'),
+        expires_in: moment().add(1, 'week').format('x'),
+        // expires_in: moment().format('x'),
+        refresh_token: crypto.createHash('sha256').update(client_id).update(username).update(moment().add(2, 'weeks').format('x')).digest('hex'),
+        refresh_token_expires_in: moment().add(2, 'weeks').format('x')
     }
 }
 

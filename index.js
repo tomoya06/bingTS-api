@@ -41,7 +41,7 @@ MongoClient.connect(config.dburl, options, function(error, database) {
     app.use(bodyParser.urlencoded({ extended: true }))
     
     app.use(loggerRouter)
-    app.use(validRouter)
+    app.use((req, res, next) => validRouter(req, res, next, db))
     
     const files = fs.readdirSync(path.resolve(__dirname, 'routers'))
     const handlerWrapper = handler => (req, res, next) => req.skip? next(): handler(req, res, next, db)
