@@ -12,7 +12,7 @@
     "body-parser": "^1.18.3",
     "cheerio": "^1.0.0-rc.2",
     "express": "^4.16.4",
-    "moment": "^2.22.2",
+    "moment": "^2.23.0",
     "mongodb": "^3.1.10",
     "mongoose": "^5.3.14",
     "string-random": "^0.1.3",

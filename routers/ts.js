@@ -18,16 +18,16 @@ module.exports = {
             if ($('.content').find('.no_results').length > 0) {
                 req.code = 404
                 req.error = 'No results'
-                next()
+                return next()
             } else {
                 req.code = 200
                 req.results = extractJson($)
-                next()
+                return next()
             }
         }).catch(error => {
             req.code = 500
             req.error = error
-            next()
+            return next()
         })
 
 

@@ -34,7 +34,8 @@ MongoClient.connect(config.dburl, options, function(error, database) {
         return 
     }
 
-    const db = database.db()
+    // TODO: change db(<db name>)
+    const db = database.db('test')
 
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: true }))
@@ -45,7 +46,7 @@ MongoClient.connect(config.dburl, options, function(error, database) {
     const files = fs.readdirSync(path.resolve(__dirname, 'routers'))
     const handlerWrapper = handler => (req, res, next) => req.skip? next(): handler(req, res, next, db)
     files.forEach(file => {
-        let route = file.replace(/\.js$/i, '').replace(/_/g, '/').replace(/^(\w*)$/i, '/$1')
+        let route = '/' + file.replace(/\.js$/i, '').replace(/_/g, '/')
         let handler = handlerWrapper(require(`./routers/${file}`).handler)
         app.use(route, handler)
     })
