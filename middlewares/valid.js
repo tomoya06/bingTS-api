@@ -25,7 +25,9 @@ async function checkAuth(req, targetScope, db) {
         assert.strictEqual(moment().format('x')<tokenRes.expires_in, true)
 
         const { scope } = await db.collection('client').findOne({ client_id: tokenRes.client_id })
-        assert.notStrictEqual(scope.indexOf(targetScope+';'), -1)
+
+        const scopeReg = new RegExp(`(\\bADMIN\\b|(\\b|\\s)${targetScope}(\\b|\\s))`, 'gm')
+        assert.notStrictEqual(scope.match(scopeReg), null)
         
         return true
     } catch (error) {

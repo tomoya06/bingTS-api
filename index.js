@@ -14,7 +14,7 @@ const validRouter = require('./middlewares/valid')
     config file should have:
     dburl: string, target mongodb url
 */
-const config = require('./config')
+const dbconfig = require('./config')
 
 const MongoClient = mongodb.MongoClient
 
@@ -26,7 +26,7 @@ const dbcntLogger = setInterval(() => {
     console.count('Connecting to remote DB')
 }, 1000)
 
-MongoClient.connect(config.dburl, options, function(error, database) {
+MongoClient.connect(dbconfig.dburl, options, function(error, database) {
     clearInterval(dbcntLogger)
 
     if (error) {
@@ -35,7 +35,7 @@ MongoClient.connect(config.dburl, options, function(error, database) {
     }
 
     // TODO: change db(<db name>)
-    const db = database.db('test')
+    const db = database.db(dbconfig.dbname)
 
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: true }))
