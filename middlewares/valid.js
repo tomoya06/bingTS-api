@@ -28,10 +28,10 @@ async function checkAuth(req, targetScope, db) {
 
         const scopeReg = new RegExp(`(\\bADMIN\\b|(\\b|\\s)${targetScope}(\\b|\\s))`, 'gm')
         assert.notStrictEqual(scope.match(scopeReg), null)
-        
-        return true
+
+        return (scope.match(/\bADMIN\b/gm) !== null ? 1: 2)
     } catch (error) {
-        return false
+        return 0
     }
 }
 
@@ -67,6 +67,9 @@ module.exports = async (req, res, next, db) => {
             req.skip = true
             return next()
         }
+
+        req.admin = isAuthValid===1
+        return next()
     }
 
     return next()

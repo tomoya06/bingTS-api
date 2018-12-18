@@ -13,10 +13,6 @@
             "error",
             4
         ],
-        "linebreak-style": [
-            "error",
-            "windows"
-        ],
         "quotes": [
             "error",
             "single"
@@ -26,6 +22,7 @@
             "never"
         ],
         "no-console": "off",
-        "no-unused-vars": "off"
+        "no-unused-vars": "off",
+        "linebreak-style": "off"
     }
 }

@@ -8,7 +8,7 @@ async function isClientValid(client_id, client_secret, db) {
     if (!clientRes || clientRes.client_secret !== client_secret) {
         return false
     }
-    return true 
+    return (clientRes.scope === 'ADMIN' ? 1: 2)
 }
 
 async function isUserValid(username, password, db) {
@@ -16,7 +16,7 @@ async function isUserValid(username, password, db) {
     if (!userRes || userRes.password !== password) {
         return false
     }
-    return true
+    return (userRes.role === 'ADMIN' ? 1: 2)
 }
 
 function generateToken(client_id, username) {
@@ -50,13 +50,16 @@ module.exports = {
     auth: null,
     handler: async (req, res, next, db) => {
         const { client_id='', client_secret='', username='', password='' } = req.body
-        if (!isClientValid(client_id, client_secret, db) || !isUserValid(username, password, db)) {
+        const clientValidRes = await isClientValid(client_id, client_secret, db) 
+        const userValidRes = await isUserValid(username, password, db)
+        if (!clientValidRes || !userValidRes) {
             // login error
             req.error = 'login error'
             req.code = 401
-            return next()            
+            return next()
         }
         const newToken = generateToken(client_id, username)
+        
         // db insert will add '_id' to original document object...
         const dbNewToken = Object.assign({}, newToken)
         const [insertRes, insertError] = await insertNewToken(dbNewToken, db)
@@ -66,7 +69,9 @@ module.exports = {
             req.code = 500
             return next()
         }
-
+        
+        clientValidRes===1 ? newToken.admin_access_scope = true: null
+        userValidRes===1 ? newToken.admin = true: null
         // new token success
         req.code = 200
         req.results = newToken

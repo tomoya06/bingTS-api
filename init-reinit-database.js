@@ -1,5 +1,4 @@
 const mongodb = require('mongodb')
-const moment = require('moment')
 
 const dbconfig = require('./config')
 const options = {

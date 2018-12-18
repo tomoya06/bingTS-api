@@ -1,5 +1,4 @@
 const mongodb = require('mongodb')
-const moment = require('moment')
 
 const dbconfig = require('./config')
 const options = {
@@ -17,6 +16,7 @@ mongodb.connect(dbconfig.dburl, options, async function(error, database) {
     await db.collection('user').insertOne({
         username: 'admin',
         password: 'peng-476612',
+        role: 'ADMIN'
     })
 
     await db.collection('client').insertOne({
